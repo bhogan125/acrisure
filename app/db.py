@@ -1,4 +1,3 @@
-from datetime import datetime
 import sqlite3
 
 DB_PATH = "cache.db"
@@ -26,9 +25,23 @@ def get_connection() -> sqlite3.Connection:
 
 def insert_vin_data(vin: str, make: str, model: str,
                     model_year: str, body_class: str) -> None:
+    """
+    Inserts VIN data into the cache. If any of the fields are missing, they will be replaced with
+    "MISSING" to satisfy the table schema.
+    """
+    # In case this information was somehow not available in the vPIC API response
+    # This satisfies the table schema, since none of these fields are nullable
+    if not make:
+        make = "MISSING"
+    if not model:
+        model = "MISSING"
+    if not model_year:
+        model_year = "MISSING"
+    if not body_class:
+        body_class = "MISSING"
+
     with get_connection() as conn:
         cur = conn.cursor()
-        # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cur.execute(
             """
             INSERT INTO VINcache (vin, make, model, model_year, body_class, timestamp)
@@ -36,9 +49,11 @@ def insert_vin_data(vin: str, make: str, model: str,
             """,
             (vin, make, model, model_year, body_class),
         )
-        pass
 
 def fetch_vin_data(vin: str) -> dict[str, str] | None:
+    """
+    Returns the VIN data from the cache if it exists
+    """
     with get_connection() as conn:
         cur = conn.cursor()
         cur.execute(
@@ -48,7 +63,8 @@ def fetch_vin_data(vin: str) -> dict[str, str] | None:
         row = cur.fetchone()
         if row is None:
             return None
-        return {  # TODO - I think row is a tuple, confirm
+
+        return {
             "vin": row["vin"],
             "make": row["make"],
             "model": row["model"],
@@ -58,6 +74,9 @@ def fetch_vin_data(vin: str) -> dict[str, str] | None:
         }
 
 def delete_vin_data(vin: str) -> bool:
+    """
+    Deletes the VIN data from the cache if it exists
+    """
     with get_connection() as conn:
         cur = conn.cursor()
         cur.execute(

@@ -8,11 +8,16 @@ base_url = "https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/{}?format=json"
 attrs = ['Make', 'Model', 'Model Year', 'Body Class']
 
 def get_vin_data(vin: str) -> dict:
+    """
+    Fetches data about VIN from the vPIC API and returns a dict of the relevant attributes.
+    Raises a ValueError if the API call fails or returns an invalid response, since this would
+    most likely stem from an invalid VIN
+    """
     ret = {"Input VIN": vin}
     resp = requests.get(base_url.format(vin))
     if resp.status_code == 200:
         data = resp.json()
-        if 'Results' not in data:  # TODO - logging
+        if 'Results' not in data:
             raise ValueError("Invalid response from vPIC API")
 
         for i in data['Results']:
