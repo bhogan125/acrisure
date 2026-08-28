@@ -10,4 +10,6 @@ I considered turning the VIN validation checks that run in the `/lookup/{vin}` a
 
 I structured the code in a way I would structure a larger service. Especially for services that interact with an external API, I like to have all of the code for interacting with/parsing the responses from that API inside of a client class. With this only interacting with the 1 endpoint though, I did not think that this was a better option than just having the get_vin_data() function. Similarly for the DB code, if it got much more complex than this I would have it inside of a dedicated class that manages the details of connecting to the DB and everything. This was a common pattern at Pindrop in some services that could be served using one of multiple DBs, so having a common interface to use made it trivial to swap DBs when needed.
 
+If expanding the service, I would move the custom exception handlers and the endpoint handlers to their own individual code files, keeping main.py to just setting up the DB and the app and registering the valid endpoints/routes.
+
 Try looking up the "vin" `ElectroDanceMusic` to get sent to a set from some of my favorite DJs.

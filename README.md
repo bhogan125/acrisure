@@ -30,13 +30,13 @@ It will then be available at `http://127.0.0.1:8000/`
 
 ## API Endpoints
 ### Lookup
-`GET http://127.0.0.1:8000/lookup/{vin}`
+`GET http://127.0.0.1:8000/lookup/1XPWD40X1ED215307`
 
 `Example Response - {"Input VIN":"1XPWD40X1ED215307","Make":"PETERBILT","Model":"388","Model Year":"2014","Body Class":"Truck-Tractor","cached":true}`
 
 
 ### Remove
-`GET http://127.0.0.1:8000/remove/{vin}`
+`GET http://127.0.0.1:8000/remove/1XPWD40X1ED215307`
 
 `Example Response - {"Input VIN":"1XPWD40X1ED215307","Delete Successful":false}`
 
