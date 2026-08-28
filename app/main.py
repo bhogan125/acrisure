@@ -1,8 +1,9 @@
 from __future__ import annotations
 from pathlib import Path
+from random import randint
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from .db import init_db, insert_vin_data, fetch_vin_data, delete_vin_data
@@ -32,7 +33,7 @@ def health_check() -> dict[str, str]:
 
 
 @app.get("/lookup/{vin}", response_model=VINData)
-def lookup_vin(vin: str) -> dict[str, str]:
+def lookup_vin(vin: str) -> dict[str, str] | RedirectResponse:
     """
     Checks the cache for VIN data, if it is not found, then it tries to obtain the VIN data from
     the vPIC API, stores that data in the cache, and then returns the data to the user
@@ -42,6 +43,10 @@ def lookup_vin(vin: str) -> dict[str, str]:
         raise HTTPException(status_code=400, detail="valid VINs are 17 characters long")
     if not vin.isalnum():
         raise HTTPException(status_code=400, detail="valid VINs must be alphanumeric")
+
+    # easter egg for anyone who happens to be a fan of EDM. See note in NOTES.md
+    if vin == 'ElectroDanceMusic':
+        return RedirectResponse(url=dj_sets[randint(0, len(dj_sets) - 1)])
 
     data = fetch_vin_data(vin)
     if data is None:
@@ -116,3 +121,10 @@ async def generic_exception_handler(request, exc: Exception):
         status_code=500,
         content={"message": "Internal server error", "error": str(exc)},
     )
+
+# Sets from some of my favorite DJs
+dj_sets = ["https://www.youtube.com/watch?v=OI02QgEA1Zw",
+           "https://www.youtube.com/watch?v=9s1x9eHoEBE",
+           "https://www.youtube.com/watch?v=aDAWctObTvI",
+           "https://www.youtube.com/watch?v=eQ-OVsdK-hM",
+           "https://www.youtube.com/watch?v=dQw4w9WgXcQ"]

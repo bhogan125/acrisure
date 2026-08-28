@@ -1,0 +1,13 @@
+These notes are not in any particular order.
+
+I used uvicorn alone because of the small scope of this service. If this was actually going to be deployed somewhere I would put the uvicorn gateway worker behind some sort of proxy (whether nginx, or the standard proxy that Acrisure uses for its services).
+
+In a similar vein, if this were to be deployed as a real service, I would also write a Dockerfile and have this run in a container (with the SQLite cache being a mounted volume so you had persistent data storage even if the container was restarted/killed). Given the small scope of this service, I did not think that the (admittedly very small) overhead of a container made much sense, given than Python does have virtual environments to facilitate installing dependencies for your services in an isolated manner.
+
+For exporting the cache to a parquet file, I did that locally (in that I accessed the /export endpoint while the service was running, and downloaded the file), and then used pyarrow to open the file and see that it contained the correct data. However, I am not sure if there is a more efficient/better way of writing the SQLite table to a parquet file than what I implemented.
+
+I considered turning the VIN validation checks that run in the `/lookup/{vin}` and `/remove/{vin}` endpoints into a helper function and just calling it. I decided that due to only 2 endpoints validating a VIN, and that the validation itself was so simple, it would have been an unnecessary abstraction that would make parsing the endpoint code more difficult. If the validation was more involved, or substantially more endpoints were added that accepted a VIN that needed to be validated, I would absolutely move those checks into their own function.
+
+I structured the code in a way I would structure a larger service. Especially for services that interact with an external API, I like to have all of the code for interacting with/parsing the responses from that API inside of a client class. With this only interacting with the 1 endpoint though, I did not think that this was a better option than just having the get_vin_data() function. Similarly for the DB code, if it got much more complex than this I would have it inside of a dedicated class that manages the details of connecting to the DB and everything. This was a common pattern at Pindrop in some services that could be served using one of multiple DBs, so having a common interface to use made it trivial to swap DBs when needed.
+
+Try looking up the "vin" `ElectroDanceMusic` to get sent to a set from some of my favorite DJs.
