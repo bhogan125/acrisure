@@ -1,5 +1,7 @@
 These notes are not in any particular order.
 
+I had claude implement a minimal, generic FastAPI service initially, and ended up retaining only about 5-10% of what it wrote, the boilerplate of setting up the DB connection and the FastAPI app. I wrote all of the actual implementation and functionality of the service.
+
 I used uvicorn alone because of the small scope of this service. If this was actually going to be deployed somewhere I would put the uvicorn gateway worker behind some sort of proxy (whether nginx, or the standard proxy that Acrisure uses for its services).
 
 In a similar vein, if this were to be deployed as a real service, I would also write a Dockerfile and have this run in a container (with the SQLite cache being a mounted volume so you had persistent data storage even if the container was restarted/killed). Given the small scope of this service, I did not think that the (admittedly very small) overhead of a container made much sense, given than Python does have virtual environments to facilitate installing dependencies for your services in an isolated manner.
